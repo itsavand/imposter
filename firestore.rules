@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidRoom(data) {
+      return data.keys().hasAll(['hostId', 'code', 'status', 'createdAt'])
+        && data.hostId == request.auth.uid
+        && data.code is string && data.code.size() >= 4 && data.code.size() <= 10
+        && data.status in ['waiting', 'playing', 'voting', 'result', 'finished']
+        && data.createdAt is number
+        && (!('category' in data) || (data.category is string && data.category.size() <= 50))
+        && (!('totalRounds' in data) || data.totalRounds is number)
+        && (!('currentRound' in data) || data.currentRound is number)
+        && (!('currentWord' in data) || (data.currentWord is string && data.currentWord.size() <= 50))
+        && (!('imposterId' in data) || (data.imposterId is string && data.imposterId.size() <= 128))
+        && (!('roundEndTime' in data) || data.roundEndTime is number);
+    }
+
+    function isRoomHost(roomId) {
+      return exists(/databases/$(database)/documents/rooms/$(roomId)) 
+             && get(/databases/$(database)/documents/rooms/$(roomId)).data.hostId == request.auth.uid;
+    }
+
+    function isValidPlayer(data) {
+       return data.keys().hasAll(['userId', 'name', 'score', 'joinedAt'])
+         && data.userId is string
+         && data.name is string && data.name.size() > 0 && data.name.size() <= 50
+         && data.score is number
+         && data.joinedAt is number
+         && (!('vote' in data) || (data.vote is string && data.vote.size() <= 128));
+    }
+
+    match /rooms/{roomId} {
+      allow read: if isSignedIn() && isValidId(roomId);
+      allow create: if isSignedIn() && isValidId(roomId) && isValidRoom(incoming());
+      allow update: if isSignedIn() && isValidId(roomId) 
+                    && existing().hostId == request.auth.uid 
+                    && existing().hostId == incoming().hostId
+                    && isValidRoom(incoming());
+      
+      match /players/{playerId} {
+        allow read: if isSignedIn() && isValidId(roomId) && isValidId(playerId);
+        
+        allow create: if isSignedIn() 
+                      && isValidId(roomId) && isValidId(playerId)
+                      && incoming().userId == request.auth.uid
+                      && playerId == request.auth.uid
+                      && isValidPlayer(incoming());
+                      
+        allow update: if isSignedIn() 
+                      && isValidId(roomId) && isValidId(playerId)
+                      && isValidPlayer(incoming())
+                      && incoming().userId == existing().userId
+                      && (
+                        (
+                          existing().userId == request.auth.uid
+                          && incoming().diff(existing()).affectedKeys().hasOnly(['vote', 'name']) // player can change their name or vote
+                        ) 
+                        ||
+                        (
+                          isRoomHost(roomId)
+                        )
+                      );
+      }
+    }
+  }
+}

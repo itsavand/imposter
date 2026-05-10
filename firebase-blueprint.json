@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "Room": {
+      "title": "Room",
+      "description": "A game room",
+      "type": "object",
+      "properties": {
+        "hostId": { "type": "string" },
+        "code": { "type": "string" },
+        "status": { "type": "string", "enum": ["waiting", "playing", "voting", "result", "finished"] },
+        "category": { "type": "string" },
+        "totalRounds": { "type": "number" },
+        "currentRound": { "type": "number" },
+        "currentWord": { "type": "string" },
+        "imposterId": { "type": "string" },
+        "roundEndTime": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["hostId", "code", "status", "createdAt"]
+    },
+    "Player": {
+      "title": "Player",
+      "description": "A player in a room",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "score": { "type": "number" },
+        "vote": { "type": "string" },
+        "joinedAt": { "type": "number" }
+      },
+      "required": ["userId", "name", "score", "joinedAt"]
+    }
+  },
+  "firestore": {
+    "rooms/{roomId}": {
+      "schema": "Room",
+      "description": "Game Rooms"
+    },
+    "rooms/{roomId}/players/{playerId}": {
+      "schema": "Player",
+      "description": "Players in a room"
+    }
+  }
+}
