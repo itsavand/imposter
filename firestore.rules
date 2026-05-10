@@ -39,7 +39,8 @@ service cloud.firestore {
     }
 
     match /rooms/{roomId} {
-      allow read: if isSignedIn() && isValidId(roomId);
+      allow get: if isSignedIn() && isValidId(roomId);
+      allow list: if isSignedIn();
       allow create: if isSignedIn() && isValidId(roomId) && isValidRoom(incoming());
       allow update: if isSignedIn() && isValidId(roomId) 
                     && existing().hostId == request.auth.uid 
@@ -47,7 +48,8 @@ service cloud.firestore {
                     && isValidRoom(incoming());
       
       match /players/{playerId} {
-        allow read: if isSignedIn() && isValidId(roomId) && isValidId(playerId);
+        allow get: if isSignedIn() && isValidId(roomId) && isValidId(playerId);
+        allow list: if isSignedIn() && isValidId(roomId);
         
         allow create: if isSignedIn() 
                       && isValidId(roomId) && isValidId(playerId)
