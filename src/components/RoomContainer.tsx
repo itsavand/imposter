@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db, auth, OperationType, handleFirestoreError } from "../firebase";
-import { doc, onSnapshot, collection, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot, collection, updateDoc, deleteDoc, getDoc, deleteField } from "firebase/firestore";
 import { CATEGORIES } from "../constants";
 import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, Check, X, Crown, Clock } from "lucide-react";
@@ -104,7 +104,7 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
 
     // Reset votes in parallel
     const promises = players.map(p => 
-       updateDoc(doc(db, "rooms", roomId, "players", p.userId), { vote: null }).catch(console.error)
+       updateDoc(doc(db, "rooms", roomId, "players", p.userId), { vote: deleteField() }).catch(console.error)
     );
     await Promise.all(promises);
 
@@ -400,7 +400,7 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
              </div>
              {isHost && (
                 <button onClick={() => updateDoc(doc(db, "rooms", roomId), { status: "waiting", currentRound: 0 }).then(() => {
-                  players.forEach(p => updateDoc(doc(db, "rooms", roomId, "players", p.userId), { score: 0 }));
+                  players.forEach(p => updateDoc(doc(db, "rooms", roomId, "players", p.userId), { score: 0, vote: deleteField() }));
                 })} className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-lg tracking-wide hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 uppercase mt-auto">
                   Dîsa Bileyze
                 </button>
