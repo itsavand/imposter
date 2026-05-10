@@ -40,6 +40,10 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
   }, [roomId]);
 
   useEffect(() => {
+    transitioningRef.current = false;
+  }, [room?.status, room?.currentRound]);
+
+  useEffect(() => {
     if (!room) return;
 
     const interval = setInterval(() => {
@@ -69,8 +73,6 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
              }
            }
         }
-      } else {
-        transitioningRef.current = false;
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -100,10 +102,11 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
     const catWords = CATEGORIES[room.category as keyof typeof CATEGORIES].words;
     const word = catWords[Math.floor(Math.random() * catWords.length)];
 
-    // Reset votes
-    for (const p of players) {
-       await updateDoc(doc(db, "rooms", roomId, "players", p.userId), { vote: null }).catch(console.error);
-    }
+    // Reset votes in parallel
+    const promises = players.map(p => 
+       updateDoc(doc(db, "rooms", roomId, "players", p.userId), { vote: null }).catch(console.error)
+    );
+    await Promise.all(promises);
 
     await updateDoc(doc(db, "rooms", roomId), {
       status: "playing",
