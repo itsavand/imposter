@@ -29,16 +29,18 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-        <p className="animate-pulse font-bold tracking-widest text-slate-400 uppercase text-xs">چاڤەڕێی ژوورێ...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white relative">
+        <div className="fixed inset-0 z-0 bg-slate-950 bg-[url('/bg.png')] bg-cover bg-center opacity-50 md:opacity-20 pointer-events-none mix-blend-overlay"></div>
+        <p className="animate-pulse font-bold tracking-widest text-slate-400 uppercase text-xs z-10 relative">چاڤەڕێی ژوورێ...</p>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white px-4" dir="rtl">
-        <div className="max-w-md w-full text-center space-y-8">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white px-4 relative" dir="rtl">
+        <div className="fixed inset-0 z-0 bg-slate-950 bg-[url('/bg.png')] bg-cover bg-center opacity-50 md:opacity-20 pointer-events-none mix-blend-overlay"></div>
+        <div className="max-w-md w-full text-center space-y-8 z-10 relative">
           <h1 className="text-6xl font-black tracking-tighter text-white drop-shadow-md">
             مروفي <span className="text-red-500">دره وين</span>
           </h1>
@@ -58,6 +60,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-indigo-500/30 flex flex-col overflow-hidden relative">
+      <div className="fixed inset-0 z-0 bg-slate-950 bg-[url('/bg.png')] bg-cover bg-center opacity-50 md:opacity-20 pointer-events-none mix-blend-overlay"></div>
       {roomId ? (
         <RoomContainer roomId={roomId} onLeave={() => setRoomId(null)} />
       ) : (
