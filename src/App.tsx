@@ -8,7 +8,15 @@ import { LogOut } from "lucide-react";
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [roomId, setRoomId] = useState<string | null>(null);
+  const [roomId, setRoomId] = useState<string | null>(() => sessionStorage.getItem("roomId"));
+
+  useEffect(() => {
+    if (roomId) {
+      sessionStorage.setItem("roomId", roomId);
+    } else {
+      sessionStorage.removeItem("roomId");
+    }
+  }, [roomId]);
 
   useEffect(() => {
     testConnection();

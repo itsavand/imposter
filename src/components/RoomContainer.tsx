@@ -16,6 +16,33 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
   const [timeLeft, setTimeLeft] = useState(0);
   const transitioningRef = React.useRef(false);
 
+  const [isCardRevealed, setIsCardRevealed] = useState(false);
+  const [toasts, setToasts] = useState<{id: number, msg: string}[]>([]);
+
+  const addToast = (msg: string) => {
+    const id = Date.now() + Math.random();
+    setToasts(prev => [...prev, { id, msg }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 3000);
+  };
+
+  useEffect(() => {
+    setIsCardRevealed(false);
+  }, [room?.currentRound]);
+
+  const prevPlayersRef = React.useRef<any[]>([]);
+  useEffect(() => {
+    if (!loading && prevPlayersRef.current.length > 0) {
+      const left = prevPlayersRef.current.filter(p1 => !players.find(p2 => p2.userId === p1.userId));
+      left.forEach(p => addToast(`❌ ${p.name} derket`));
+
+      const joined = players.filter(p1 => !prevPlayersRef.current.find(p2 => p2.userId === p1.userId));
+      joined.forEach(p => addToast(`👋 ${p.name} tevlî bû`));
+    }
+    prevPlayersRef.current = players;
+  }, [players, loading]);
+
   useEffect(() => {
     const unsubRoom = onSnapshot(doc(db, "rooms", roomId), (docSnap) => {
       if (docSnap.exists()) {
@@ -225,7 +252,7 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
         const isImposter = room.imposterId === auth.currentUser?.uid;
         return (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
-             <div className="w-24 h-24 rounded-full border-4 border-slate-800 flex items-center justify-center mb-12 relative shadow-lg">
+             <div className="w-24 h-24 rounded-full border-4 border-slate-800 flex items-center justify-center mb-6 relative shadow-lg">
                <svg className="absolute inset-0 w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
                  <circle cx="50" cy="50" r="46" fill="transparent" stroke="#1e293b" strokeWidth="8" />
                  <circle cx="50" cy="50" r="46" fill="transparent" stroke="#6366f1" strokeWidth="8" strokeDasharray={289} strokeDashoffset={289 - (289 * timeLeft) / 60} className="transition-all duration-1000 ease-linear" />
@@ -233,30 +260,59 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
                <span className="text-3xl font-black text-indigo-400 font-mono tracking-tighter">{Math.max(0, timeLeft)}</span>
              </div>
 
-             <div className="space-y-2 mb-12">
+             <div className="space-y-2 mb-8">
                <p className="text-slate-500 font-black tracking-widest uppercase text-xs">Geryana {room.currentRound} ji {room.totalRounds}</p>
              </div>
 
-             <div className="bg-indigo-600/20 border-2 border-indigo-500/50 w-full p-10 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col items-center justify-center min-h-[250px]">
-                {isImposter ? (
-                  <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="relative z-10 w-full">
-                     <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-                        <span className="font-black text-5xl tracking-tighter uppercase whitespace-nowrap">Sextekar</span>
-                     </div>
-                     <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Rola Te</h2>
-                     <p className="text-rose-500 font-black text-4xl mb-4 tracking-tighter shadow-sm">TU SEXTEKARÎ!</p>
-                     <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase">Xwe eşkere neke!</p>
-                  </motion.div>
-                ) : (
-                  <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="relative z-10 w-full">
-                     <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none -mt-4">
-                        <span className="font-black text-7xl tracking-tighter uppercase whitespace-nowrap">Peyv</span>
-                     </div>
-                     <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Peyva Veşartî</h2>
-                     <p className="text-5xl font-black tracking-tighter text-white mb-4 drop-shadow-md">{room.currentWord}</p>
-                     <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase italic">Hemî kes peyvekê dizanin...</p>
-                  </motion.div>
-                )}
+             <div 
+               className="w-full min-h-[250px] relative cursor-pointer group perspective-1000"
+               style={{ perspective: "1000px" }}
+               onClick={() => setIsCardRevealed(!isCardRevealed)}
+             >
+               <AnimatePresence mode="wait">
+                 {!isCardRevealed ? (
+                   <motion.div 
+                     key="front"
+                     initial={{ rotateY: 90, opacity: 0 }}
+                     animate={{ rotateY: 0, opacity: 1 }}
+                     exit={{ rotateY: -90, opacity: 0 }}
+                     transition={{ duration: 0.3 }}
+                     className="absolute inset-0 bg-slate-800 border-4 border-slate-700 w-full h-full rounded-3xl shadow-xl flex flex-col items-center justify-center p-10 group-hover:bg-slate-700 transition-colors bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-700 to-slate-900"
+                   >
+                     <p className="text-indigo-400 font-black tracking-[0.3em] uppercase text-xs mb-4">Qereta Te</p>
+                     <p className="text-white text-lg font-black tracking-wide text-center">Bitikîne da<br/>bibînî</p>
+                   </motion.div>
+                 ) : (
+                   <motion.div 
+                     key="back"
+                     initial={{ rotateY: -90, opacity: 0 }}
+                     animate={{ rotateY: 0, opacity: 1 }}
+                     exit={{ rotateY: 90, opacity: 0 }}
+                     transition={{ duration: 0.3 }}
+                     className="absolute inset-0 bg-indigo-600/20 border-2 border-indigo-500/50 w-full h-full rounded-3xl shadow-2xl flex flex-col items-center justify-center p-4 overflow-hidden"
+                   >
+                     {isImposter ? (
+                       <div className="relative z-10 w-full">
+                          <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                             <span className="font-black text-5xl tracking-tighter uppercase whitespace-nowrap">Sextekar</span>
+                          </div>
+                          <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Rola Te</h2>
+                          <p className="text-rose-500 font-black text-4xl mb-4 tracking-tighter shadow-sm">TU SEXTEKARÎ!</p>
+                          <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase">Xwe eşkere neke!</p>
+                       </div>
+                     ) : (
+                       <div className="relative z-10 w-full">
+                          <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none -mt-4">
+                             <span className="font-black text-7xl tracking-tighter uppercase whitespace-nowrap">Peyv</span>
+                          </div>
+                          <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Peyva Veşartî</h2>
+                          <p className="text-3xl sm:text-5xl font-black tracking-tighter text-white mb-4 drop-shadow-md px-2 break-all">{room.currentWord}</p>
+                          <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase italic hidden sm:block">Hemî kes peyvekê dizanin...</p>
+                       </div>
+                     )}
+                   </motion.div>
+                 )}
+               </AnimatePresence>
              </div>
           </div>
         );
@@ -413,6 +469,23 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
 
   return (
     <div className="flex-1 flex flex-col h-full relative z-10 w-full px-4">
+       {/* Toasts */}
+       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none">
+         <AnimatePresence>
+            {toasts.map(t => (
+               <motion.div 
+                 key={t.id}
+                 initial={{ opacity: 0, y: -20, scale: 0.8 }}
+                 animate={{ opacity: 1, y: 0, scale: 1 }}
+                 exit={{ opacity: 0, y: -20, scale: 0.8 }}
+                 className="bg-slate-800 text-white font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full border border-white/10 shadow-2xl"
+               >
+                 {t.msg}
+               </motion.div>
+            ))}
+         </AnimatePresence>
+       </div>
+
        <div className="absolute top-0 right-4 z-50">
            {room?.status === "waiting" && (
              <button onClick={handleLeave} className="bg-rose-600/20 text-rose-500 hover:bg-rose-600 hover:text-white px-4 py-1.5 rounded-full font-bold text-[10px] uppercase tracking-wide transition-all border border-rose-500/30">
