@@ -35,10 +35,10 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
   useEffect(() => {
     if (!loading && prevPlayersRef.current.length > 0) {
       const left = prevPlayersRef.current.filter(p1 => !players.find(p2 => p2.userId === p1.userId));
-      left.forEach(p => addToast(`❌ ${p.name} derket`));
+      left.forEach(p => addToast(`❌ ${p.name} دەرکەفت`));
 
       const joined = players.filter(p1 => !prevPlayersRef.current.find(p2 => p2.userId === p1.userId));
-      joined.forEach(p => addToast(`👋 ${p.name} tevlî bû`));
+      joined.forEach(p => addToast(`👋 ${p.name} پشکدار بوو`));
     }
     prevPlayersRef.current = players;
   }, [players, loading]);
@@ -108,8 +108,14 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
   const handleLeave = async () => {
     try {
       if (room?.hostId === auth.currentUser?.uid) {
-        // Just delete the player, but if host leaves... maybe just let them leave.
-        // Easiest is to just go to home screen for demo purposes
+        const otherPlayers = players.filter(p => p.userId !== auth.currentUser?.uid);
+        if (otherPlayers.length > 0) {
+          const newHost = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
+          await updateDoc(doc(db, "rooms", roomId), {
+            hostId: newHost.userId,
+            hostName: newHost.name
+          });
+        }
       }
       await deleteDoc(doc(db, "rooms", roomId, "players", auth.currentUser!.uid));
     } catch(e) {
@@ -193,43 +199,43 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
   }, [room, players, isHost, roomId]);
 
   if (loading || !room) {
-    return <div className="flex-1 flex items-center justify-center">Li benda Jûrê...</div>;
+    return <div className="flex-1 flex items-center justify-center font-bold text-slate-400">چاڤەڕێی ژوورێ...</div>;
   }
 
   const renderContent = () => {
     switch (room.status) {
       case "waiting":
         return (
-          <div className="flex-1 flex flex-col pt-4">
+          <div className="flex-1 flex flex-col pt-4" dir="rtl">
              <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-3xl p-6 mb-6 text-center shadow-lg">
-               <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">Koda Jûrê</p>
-               <h2 className="text-6xl font-black tracking-[0.3em] bg-slate-950 rounded-2xl py-4 text-indigo-400 inline-block px-10 shadow-inner border border-white/5 uppercase relative overflow-hidden group">
+               <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">کۆدێ ژوورێ</p>
+               <h2 className="text-6xl font-black tracking-[0.3em] bg-slate-950 rounded-2xl py-4 text-indigo-400 inline-block px-10 shadow-inner border border-white/5 uppercase relative overflow-hidden group" dir="ltr">
                  {room.code}
                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
                </h2>
                <div className="mt-4 flex gap-4 justify-center text-[10px] font-bold uppercase tracking-wider">
                   <div className="bg-slate-950 px-4 py-2 rounded-lg text-slate-300 border border-white/5">
-                    <span className="text-slate-500 mr-2">Pol:</span>{CATEGORIES[room.category as keyof typeof CATEGORIES]?.name || room.category}
+                    <span className="text-slate-500 ml-2">جور:</span>{CATEGORIES[room.category as keyof typeof CATEGORIES]?.name || room.category}
                   </div>
                   <div className="bg-slate-950 px-4 py-2 rounded-lg text-slate-300 border border-white/5">
-                    <span className="text-slate-500 mr-2">Geryan:</span>{room.totalRounds}
+                    <span className="text-slate-500 ml-2">گەڕ:</span>{room.totalRounds}
                   </div>
                </div>
              </div>
 
              <h3 className="text-sm font-black mb-4 px-2 flex items-center justify-between uppercase tracking-widest text-slate-500">
-                <span>Yarîkeran <span className="text-indigo-400">({players.length})</span></span>
+                <span>یاریزانان <span className="text-indigo-400">({players.length})</span></span>
              </h3>
              <div className="grid grid-cols-2 gap-3 mb-auto overflow-y-auto pr-2 pb-6">
                 {players.map(p => (
                    <div key={p.userId} className="bg-white/5 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center font-black text-lg text-white shadow-lg">
+                      <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center font-black text-lg text-white shadow-lg shrink-0">
                         {p.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                          <p className="font-bold truncate text-sm">{p.name}</p>
                          {p.userId === room.hostId && (
-                           <p className="text-[10px] text-amber-500 font-black uppercase tracking-widest flex items-center gap-1 mt-0.5"><Crown size={12}/> Host</p>
+                           <p className="text-[10px] text-amber-500 font-black uppercase tracking-widest flex items-center gap-1 mt-0.5"><Crown size={12}/> رێڤەبەر</p>
                          )}
                       </div>
                    </div>
@@ -238,12 +244,12 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
 
              {isHost && (
                 <button onClick={startNextRound} disabled={players.length < 3} className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-lg tracking-wide hover:bg-indigo-500 transition-all disabled:opacity-50 mt-4 shadow-xl shadow-indigo-500/20 uppercase">
-                  {players.length < 3 ? "Kêmanî 3 yarîker" : "Yariyê Destpêbike"}
+                  {players.length < 3 ? "کێمترین ٣ یاریزان" : "یاریێ دەستپێبکە"}
                 </button>
              )}
              {!isHost && (
                 <div className="text-center p-4 bg-slate-900/50 rounded-xl text-slate-400 font-bold uppercase tracking-widest text-[10px] border border-white/5">
-                  Li benda host e ku destpê bike...
+                  چاڤەڕێی رێڤەبەری یە بۆ دەستپێکرنێ...
                 </div>
              )}
           </div>
@@ -253,15 +259,15 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
         return (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
              <div className="w-24 h-24 rounded-full border-4 border-slate-800 flex items-center justify-center mb-6 relative shadow-lg">
-               <svg className="absolute inset-0 w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+               <svg className="absolute inset-0 w-full h-full transform 1scale-x-[-1] -rotate-90" viewBox="0 0 100 100">
                  <circle cx="50" cy="50" r="46" fill="transparent" stroke="#1e293b" strokeWidth="8" />
                  <circle cx="50" cy="50" r="46" fill="transparent" stroke="#6366f1" strokeWidth="8" strokeDasharray={289} strokeDashoffset={289 - (289 * timeLeft) / 60} className="transition-all duration-1000 ease-linear" />
                </svg>
-               <span className="text-3xl font-black text-indigo-400 font-mono tracking-tighter">{Math.max(0, timeLeft)}</span>
+               <span className="text-3xl font-black text-indigo-400 font-mono tracking-tighter" dir="ltr">{Math.max(0, timeLeft)}</span>
              </div>
 
              <div className="space-y-2 mb-8">
-               <p className="text-slate-500 font-black tracking-widest uppercase text-xs">Geryana {room.currentRound} ji {room.totalRounds}</p>
+               <p className="text-slate-500 font-black tracking-widest uppercase text-xs">گەڕا {room.currentRound} ژ {room.totalRounds}</p>
              </div>
 
              <div 
@@ -279,8 +285,8 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
                      transition={{ duration: 0.3 }}
                      className="absolute inset-0 bg-slate-800 border-4 border-slate-700 w-full h-full rounded-3xl shadow-xl flex flex-col items-center justify-center p-10 group-hover:bg-slate-700 transition-colors bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-700 to-slate-900"
                    >
-                     <p className="text-indigo-400 font-black tracking-[0.3em] uppercase text-xs mb-4">Qereta Te</p>
-                     <p className="text-white text-lg font-black tracking-wide text-center">Bitikîne da<br/>bibînî</p>
+                     <p className="text-indigo-400 font-black tracking-[0.3em] uppercase text-xs mb-4">کارتا تە</p>
+                     <p className="text-white text-lg font-black tracking-wide text-center leading-relaxed">کلیک بکە دا<br/>ببینی</p>
                    </motion.div>
                  ) : (
                    <motion.div 
@@ -294,20 +300,20 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
                      {isImposter ? (
                        <div className="relative z-10 w-full">
                           <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-                             <span className="font-black text-5xl tracking-tighter uppercase whitespace-nowrap">Sextekar</span>
+                             <span className="font-black text-5xl tracking-tighter uppercase whitespace-nowrap">ساختەکار</span>
                           </div>
-                          <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Rola Te</h2>
-                          <p className="text-rose-500 font-black text-4xl mb-4 tracking-tighter shadow-sm">TU SEXTEKARÎ!</p>
-                          <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase">Xwe eşkere neke!</p>
+                          <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">رۆلێ تە</h2>
+                          <p className="text-rose-500 font-black text-4xl mb-4 tracking-tighter shadow-sm">تو ساختەکاری!</p>
+                          <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase">خۆ ئاشکرا نەکە!</p>
                        </div>
                      ) : (
                        <div className="relative z-10 w-full">
                           <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none -mt-4">
-                             <span className="font-black text-7xl tracking-tighter uppercase whitespace-nowrap">Peyv</span>
+                             <span className="font-black text-7xl tracking-tighter uppercase whitespace-nowrap">پەیڤ</span>
                           </div>
-                          <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Peyva Veşartî</h2>
+                          <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">پەیڤا نهێنی</h2>
                           <p className="text-3xl sm:text-5xl font-black tracking-tighter text-white mb-4 drop-shadow-md px-2 break-all">{room.currentWord}</p>
-                          <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase italic hidden sm:block">Hemî kes peyvekê dizanin...</p>
+                          <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase italic hidden sm:block">هەمی کەس پەیڤەکێ دزانن...</p>
                        </div>
                      )}
                    </motion.div>
@@ -320,8 +326,8 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
         return (
           <div className="flex-1 flex flex-col justify-center pt-8">
              <div className="text-center mb-10">
-                <h2 className="text-4xl font-black tracking-tighter text-white mb-2">Dengdan</h2>
-                <p className="text-slate-400 font-bold text-xs tracking-widest uppercase">Kî sextekar e?</p>
+                <h2 className="text-4xl font-black tracking-tighter text-white mb-2">دەنگدان</h2>
+                <p className="text-slate-400 font-bold text-xs tracking-widest uppercase">کێ ساختەکارە؟</p>
              </div>
 
              <div className="grid grid-cols-2 gap-4">
@@ -356,9 +362,9 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
                         <span className="font-bold text-sm truncate w-full text-center">{p.name}</span>
                         
                         {!p.vote ? (
-                           <span className="text-[10px] text-amber-500 font-bold mt-2 animate-pulse uppercase tracking-tighter flex items-center gap-1">Yê biryarê dide</span>
+                           <span className="text-[10px] text-amber-500 font-bold mt-2 animate-pulse uppercase tracking-tighter flex items-center gap-1">یێ بڕیارێ ددەت</span>
                         ) : (
-                           <span className="text-[10px] text-emerald-400 font-bold mt-2 uppercase tracking-tighter flex items-center gap-1">Deng da</span>
+                           <span className="text-[10px] text-emerald-400 font-bold mt-2 uppercase tracking-tighter flex items-center gap-1">دەنگ دا</span>
                         )}
                      </button>
                    )
@@ -391,42 +397,42 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
 
         return (
           <div className="flex-1 flex flex-col items-center justify-center text-center pt-8 overflow-y-auto">
-             <h2 className="text-[10px] text-slate-500 font-black mb-8 uppercase tracking-[0.3em]">Encamên Geryanê</h2>
+             <h2 className="text-[10px] text-slate-500 font-black mb-8 uppercase tracking-[0.3em]">ئەنجامێن گەڕێ</h2>
              
              <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-6">
                <div className="w-24 h-24 rounded-full border-4 border-rose-500 mx-auto flex items-center justify-center bg-slate-900 mb-4 shadow-[0_0_40px_rgba(244,63,94,0.3)]">
                   <span className="text-5xl font-black text-white">{imposter?.name.charAt(0).toUpperCase()}</span>
                </div>
                <p className="text-3xl font-black tracking-tighter mb-2">{imposter?.name}</p>
-               <p className="text-rose-500 font-bold text-xs uppercase tracking-widest bg-rose-500/10 inline-block px-4 py-1.5 rounded-full border border-rose-500/20">Sextekar Bû!</p>
+               <p className="text-rose-500 font-bold text-xs uppercase tracking-widest bg-rose-500/10 inline-block px-4 py-1.5 rounded-full border border-rose-500/20">ساختەکار بوو!</p>
              </motion.div>
 
              <div className="bg-indigo-600/10 p-5 rounded-3xl border border-indigo-500/30 w-full max-w-sm mx-auto mb-6 shadow-inner text-center">
                <p className="text-slate-300 font-bold text-[10px] tracking-widest uppercase leading-relaxed">
                  {caught ? (
-                   <>Yarîkeran sextekar dît!<br/><span className="text-emerald-400 font-black text-sm pt-2 block">Yarîker +3 Xal</span></>
+                   <>یاریزانا ساختەکار دیت!<br/><span className="text-emerald-400 font-black text-sm pt-2 block">یاریزان +٣ خال</span></>
                  ) : (
-                   <>Sextekar xwe veşart!<br/><span className="text-rose-400 font-black text-sm pt-2 block">Sextekar +3 Xal</span></>
+                   <>ساختەکاری خۆ ڤەشارت!<br/><span className="text-rose-400 font-black text-sm pt-2 block">ساختەکار +٣ خال</span></>
                  )}
                </p>
              </div>
 
-             <div className="flex items-center gap-2 mb-6 bg-slate-900/50 px-4 py-2 rounded-full border border-white/5">
-                <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Geryana nû di</span>
-                <span className="text-indigo-400 font-mono font-black text-sm">{Math.max(0, timeLeft)}s</span>
+             <div className="flex items-center gap-2 mb-6 bg-slate-900/50 px-4 py-2 rounded-full border border-white/5" dir="rtl">
+                <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">گەڕا نوی د</span>
+                <span className="text-indigo-400 font-mono font-black text-sm" dir="ltr">{Math.max(0, timeLeft)}s</span>
              </div>
 
              {/* Scoreboard Preview */}
              <div className="w-full bg-slate-900/80 rounded-3xl p-5 border border-white/5">
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 border-b border-white/10 pb-3 text-left">Lîsteya Xalan</h3>
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 border-b border-white/10 pb-3 text-right">خشتەیا خالان</h3>
                 <div className="space-y-2">
                 {players.sort((a,b)=> b.score - a.score).map((p, i) => (
-                  <div key={p.userId} className="flex items-center justify-between p-2.5 bg-white/5 rounded-xl border border-white/5">
+                  <div key={p.userId} className="flex items-center justify-between p-2.5 bg-white/5 rounded-xl border border-white/5" dir="rtl">
                     <div className="flex items-center gap-3">
                        <div className={cn("w-6 h-6 rounded-md flex items-center justify-center font-black text-[10px]", i===0 ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20" : "bg-slate-800 text-slate-400")}>
                           0{i+1}
                        </div>
-                       <span className="font-bold text-xs truncate max-w-[120px] text-left">{p.name}</span>
+                       <span className="font-bold text-xs truncate max-w-[120px] text-right">{p.name}</span>
                     </div>
                     <span className={cn("font-black text-sm", i===0 ? "text-indigo-400" : "text-slate-400")}>{p.score}</span>
                   </div>
@@ -438,12 +444,12 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
       case "finished":
         return (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
-             <h2 className="text-5xl font-black mb-2 text-white tracking-tighter">Dawiya Yariyê</h2>
-             <p className="text-slate-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-10">Encamên Dawî</p>
+             <h2 className="text-5xl font-black mb-2 text-white tracking-tighter">یاری ب دوماهی هات</h2>
+             <p className="text-slate-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-10">ئەنجامێن دوماهیێ</p>
              
              <div className="w-full space-y-3 mb-8">
                 {players.sort((a,b)=> b.score - a.score).map((p, i) => (
-                  <div key={p.userId} className={cn("rounded-3xl p-4 flex justify-between items-center border", i===0 ? "bg-indigo-600/20 border-indigo-500/50 shadow-xl shadow-indigo-500/10 scale-105" : "bg-slate-900/50 border-white/5")}>
+                  <div key={p.userId} className={cn("rounded-3xl p-4 flex justify-between items-center border", i===0 ? "bg-indigo-600/20 border-indigo-500/50 shadow-xl shadow-indigo-500/10 scale-105" : "bg-slate-900/50 border-white/5")} dir="rtl">
                      <div className="flex items-center gap-4">
                         <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg", i===0 ? "bg-indigo-500 text-white" : "bg-slate-800 text-slate-500")}>
                            0{i+1}
@@ -454,13 +460,18 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
                   </div>
                 ))}
              </div>
-             {isHost && (
-                <button onClick={() => updateDoc(doc(db, "rooms", roomId), { status: "waiting", currentRound: 0 }).then(() => {
-                  players.forEach(p => updateDoc(doc(db, "rooms", roomId, "players", p.userId), { score: 0, vote: deleteField() }));
-                })} className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-lg tracking-wide hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 uppercase mt-auto">
-                  Dîsa Bileyze
-                </button>
-             )}
+             <div className="w-full flex gap-3 mt-auto">
+               {isHost && (
+                  <button onClick={() => updateDoc(doc(db, "rooms", roomId), { status: "waiting", currentRound: 0 }).then(() => {
+                    players.forEach(p => updateDoc(doc(db, "rooms", roomId, "players", p.userId), { score: 0, vote: deleteField() }));
+                  })} className="flex-1 bg-indigo-600 text-white p-4 rounded-xl font-black text-sm sm:text-lg tracking-wide hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 uppercase">
+                    دوبارە یاری بکە
+                  </button>
+               )}
+               <button onClick={handleLeave} className="flex-1 bg-rose-600/20 text-rose-500 hover:bg-rose-600 hover:text-white p-4 rounded-xl font-black text-sm sm:text-lg tracking-wide transition-all shadow-lg uppercase border border-rose-500/30">
+                 دەرکەفتن
+               </button>
+             </div>
           </div>
         );
       default: return null;
@@ -468,7 +479,7 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full relative z-10 w-full px-4">
+    <div className="flex-1 flex flex-col h-full relative z-10 w-full px-4" dir="rtl">
        {/* Toasts */}
        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none">
          <AnimatePresence>
@@ -486,10 +497,10 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
          </AnimatePresence>
        </div>
 
-       <div className="absolute top-0 right-4 z-50">
+       <div className="absolute top-0 right-4 z-50 mt-2">
            {room?.status === "waiting" && (
              <button onClick={handleLeave} className="bg-rose-600/20 text-rose-500 hover:bg-rose-600 hover:text-white px-4 py-1.5 rounded-full font-bold text-[10px] uppercase tracking-wide transition-all border border-rose-500/30">
-                Derketin
+                دەرکەفتن
              </button>
            )}
        </div>

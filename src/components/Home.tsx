@@ -111,17 +111,17 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
             className="space-y-4"
           >
             <div className="text-center mb-12">
-              <h1 className="text-6xl font-black italic tracking-tighter text-white drop-shadow-md">
-                SEXT<span className="text-red-500">EKAR</span>
+              <h1 className="text-6xl font-black tracking-tighter text-white drop-shadow-md">
+                ساختە<span className="text-red-500">کار</span>
               </h1>
-              <p className="text-slate-400 mt-2 text-lg font-bold tracking-wide">Kî ji me xayîn e?</p>
+              <p className="text-slate-400 mt-2 text-lg font-bold tracking-wide">کێ ژ مە ساختەکارە؟</p>
             </div>
             
             <button
               onClick={() => setMode("create")}
               className="w-full relative group overflow-hidden bg-indigo-600 text-white p-5 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-indigo-500/20"
             >
-              <div className="font-black text-xl tracking-wide uppercase">Jûrekê Çêbike</div>
+              <div className="font-black text-xl tracking-wide uppercase">ژوورەکێ چێبکە</div>
               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-indigo-600 transition-colors">
                 <Plus size={24} />
               </div>
@@ -130,7 +130,7 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
               onClick={() => setMode("join")}
               className="w-full relative group overflow-hidden bg-slate-900/80 border border-white/10 text-white p-5 rounded-2xl flex items-center justify-between transition-all hover:scale-[1.02] active:scale-[0.98] hover:border-indigo-500"
             >
-              <div className="font-black text-xl tracking-wide uppercase">Têkeve Jûrê</div>
+              <div className="font-black text-xl tracking-wide uppercase">پشکدار بە</div>
               <div className="w-10 h-10 rounded-full bg-slate-800 border border-white/5 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-colors">
                 <Users size={24} />
               </div>
@@ -149,29 +149,30 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
               onClick={() => setMode("menu")}
               className="flex items-center gap-2 text-slate-500 hover:text-white mb-6 font-bold uppercase text-xs tracking-widest transition-colors"
             >
-              <ArrowLeft size={16} /> Vegere
+              <ArrowLeft size={16} /> ڤەگەڕە
             </button>
             <form onSubmit={handleCreate} className="space-y-6 bg-slate-900/50 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl shadow-indigo-500/10">
-              <h2 className="text-3xl font-black mb-4 tracking-tighter">Mîhengên Jûrê</h2>
+              <h2 className="text-3xl font-black mb-4 tracking-tighter">رێکخستنێن ژوورێ</h2>
               
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Navê Te</label>
+                <label className="block text-[10px] text-right font-black uppercase tracking-[0.2em] text-slate-500 mb-2">ناڤێ تە</label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-white/10 rounded-xl p-4 font-black focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
-                  placeholder="Navê xwe binvîse..."
+                  className="w-full bg-slate-950/80 border border-white/10 rounded-xl p-4 font-black text-right focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
+                  placeholder="ناڤێ خۆ بنڤیسە..."
                   maxLength={15}
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Cure (Pol)</label>
+                <label className="block text-[10px] text-right font-black uppercase tracking-[0.2em] text-slate-500 mb-2">جورێ پەیڤان</label>
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-white/10 rounded-xl p-4 font-black focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all appearance-none shadow-inner"
+                  className="w-full bg-slate-950/80 border border-white/10 rounded-xl p-4 font-black focus:outline-none text-right focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner bg-right pr-10"
+                  dir="rtl"
                 >
                   {Object.values(CATEGORIES).map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
@@ -180,24 +181,25 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Geryان: {rounds}</label>
+                <label className="block text-[10px] text-right font-black uppercase tracking-[0.2em] text-slate-500 mb-2">گەڕ: {rounds}</label>
                 <input
                   type="range"
                   min="3" max="10"
                   value={rounds}
                   onChange={(e) => setRounds(parseInt(e.target.value))}
                   className="w-full accent-indigo-500 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                  dir="ltr"
                 />
               </div>
 
-              {errorMsg && <p className="text-red-500 text-sm font-bold bg-red-500/10 p-3 rounded-lg border border-red-500/20">{errorMsg}</p>}
+              {errorMsg && <p className="text-red-500 text-sm font-bold bg-red-500/10 p-3 text-right rounded-lg border border-red-500/20">{errorMsg}</p>}
 
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-indigo-600 text-white p-4 rounded-xl font-black text-lg tracking-wide hover:bg-indigo-500 transition-all disabled:opacity-50 mt-4 shadow-lg shadow-indigo-500/20 uppercase"
               >
-                {loading ? "Çêdike..." : "Destpêbike"}
+                {loading ? "چێدکەت..." : "دەستپێبکە"}
               </button>
             </form>
           </motion.div>
@@ -214,25 +216,25 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
                onClick={() => setMode("menu")}
                className="flex items-center gap-2 text-slate-500 hover:text-white mb-6 font-bold uppercase text-xs tracking-widest transition-colors"
              >
-               <ArrowLeft size={16} /> Vegere
+               <ArrowLeft size={16} /> ڤەگەڕە
              </button>
              <form onSubmit={handleJoin} className="space-y-6 bg-slate-900/50 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl shadow-indigo-500/10">
-               <h2 className="text-3xl font-black mb-4 tracking-tighter">Têkeve Jûrê</h2>
+               <h2 className="text-3xl font-black text-right mb-4 tracking-tighter">پشکدار بە</h2>
                
                <div>
-                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Navê Te</label>
+                 <label className="block text-[10px] text-right font-black uppercase tracking-[0.2em] text-slate-500 mb-2">ناڤێ تە</label>
                  <input
                    type="text"
                    value={username}
                    onChange={(e) => setUsername(e.target.value)}
-                   className="w-full bg-slate-950/80 border border-white/10 rounded-xl p-4 font-black focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
-                   placeholder="Navê xwe binvîse..."
+                   className="w-full bg-slate-950/80 border border-white/10 rounded-xl p-4 font-black text-right focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
+                   placeholder="ناڤێ خۆ بنڤیسە..."
                    maxLength={15}
                  />
                </div>
 
                <div>
-                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Koda Jûrê</label>
+                 <label className="block text-[10px] text-right font-black uppercase tracking-[0.2em] text-slate-500 mb-2">کۆدێ ژوورێ</label>
                  <input
                    type="text"
                    value={roomCode}
@@ -240,17 +242,18 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
                    className="w-full bg-slate-950/80 border border-white/10 rounded-xl p-4 font-black text-center text-3xl tracking-[0.3em] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all uppercase shadow-inner"
                    placeholder="XXXXX"
                    maxLength={5}
+                   dir="ltr"
                  />
                </div>
 
-               {errorMsg && <p className="text-red-500 text-sm font-bold bg-red-500/10 p-3 rounded-lg border border-red-500/20">{errorMsg}</p>}
+               {errorMsg && <p className="text-red-500 text-sm font-bold bg-red-500/10 p-3 text-right rounded-lg border border-red-500/20">{errorMsg}</p>}
 
                <button
                  type="submit"
                  disabled={loading}
                  className="w-full bg-indigo-600 text-white p-4 rounded-xl font-black text-lg tracking-wide hover:bg-indigo-500 transition-all disabled:opacity-50 mt-4 shadow-lg shadow-indigo-500/20 uppercase"
                >
-                 {loading ? "Têdikeve..." : "Têkeve"}
+                 {loading ? "پشکدار دبیت..." : "پشکدار بە"}
                </button>
              </form>
           </motion.div>
