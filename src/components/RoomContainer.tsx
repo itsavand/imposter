@@ -300,10 +300,10 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
                      {isImposter ? (
                        <div className="relative z-10 w-full">
                           <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-                             <span className="font-black text-5xl tracking-tighter uppercase whitespace-nowrap">ساختەکار</span>
+                             <span className="font-black text-5xl tracking-tighter uppercase whitespace-nowrap">دره وين</span>
                           </div>
                           <h2 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">رۆلێ تە</h2>
-                          <p className="text-rose-500 font-black text-4xl mb-4 tracking-tighter shadow-sm">تو ساختەکاری!</p>
+                          <p className="text-rose-500 font-black text-4xl mb-4 tracking-tighter shadow-sm"> تو دره ويني!</p>
                           <p className="text-indigo-300 text-[10px] font-bold tracking-widest uppercase">خۆ ئاشکرا نەکە!</p>
                        </div>
                      ) : (
@@ -327,7 +327,7 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
           <div className="flex-1 flex flex-col justify-center pt-8">
              <div className="text-center mb-10">
                 <h2 className="text-4xl font-black tracking-tighter text-white mb-2">دەنگدان</h2>
-                <p className="text-slate-400 font-bold text-xs tracking-widest uppercase">کێ ساختەکارە؟</p>
+                <p className="text-slate-400 font-bold text-xs tracking-widest uppercase">کێ دره وينه</p>
              </div>
 
              <div className="grid grid-cols-2 gap-4">
@@ -410,9 +410,9 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
              <div className="bg-indigo-600/10 p-5 rounded-3xl border border-indigo-500/30 w-full max-w-sm mx-auto mb-6 shadow-inner text-center">
                <p className="text-slate-300 font-bold text-[10px] tracking-widest uppercase leading-relaxed">
                  {caught ? (
-                   <>یاریزانا ساختەکار دیت!<br/><span className="text-emerald-400 font-black text-sm pt-2 block">یاریزان +٣ خال</span></>
+                   <>یاریزانا دره وين دیت!<br/><span className="text-emerald-400 font-black text-sm pt-2 block">یاریزان +٣ خال</span></>
                  ) : (
-                   <>ساختەکاری خۆ ڤەشارت!<br/><span className="text-rose-400 font-black text-sm pt-2 block">ساختەکار +٣ خال</span></>
+                   <>دره وين خۆ ڤەشارت!<br/><span className="text-rose-400 font-black text-sm pt-2 block">دره وين +٣ خال</span></>
                  )}
                </p>
              </div>

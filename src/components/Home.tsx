@@ -52,7 +52,7 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
 
       onJoin(roomId);
     } catch (error) {
-      setErrorMsg("Çêkirina jûrê serneket.");
+      setErrorMsg("سه رفه جووو.");
       handleFirestoreError(error, OperationType.CREATE, "rooms");
     } finally {
       setLoading(false);
@@ -71,14 +71,14 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
       const roomSnap = await getDoc(roomRef);
 
       if (!roomSnap.exists()) {
-         setErrorMsg("Ev jûr nîne! Koda xwe kontrol bike.");
+         setErrorMsg("ج تشتي هوسا نينه.");
          setLoading(false);
          return;
       }
 
       const roomData = roomSnap.data();
       if (roomData.status !== "waiting") {
-         setErrorMsg("Yarî derbas bûye, tu nikarî têkevî.");
+         setErrorMsg("ياري ده ربازبو.");
          setLoading(false);
          return;
       }
@@ -92,7 +92,7 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
 
       onJoin(code);
     } catch (error) {
-      setErrorMsg("Têketina jûrê serneket.");
+      setErrorMsg("سه رفه جووو.");
       handleFirestoreError(error, OperationType.GET, "rooms");
     } finally {
       setLoading(false);

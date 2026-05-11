@@ -2,21 +2,21 @@ export const CATEGORIES = {
   xwarin: {
     id: "xwarin",
     name: "Xwarin",
-    words: ["Biryanî", "Kebab", "Sêv", "Zeytûn", "Goşt", "Masî", "Dolme", "Fêkî", "Tirî", "Zebeş", "Mast", "Penîr", "Nan", "Birinc", "Hêk"]
+    words: ["برياني", "كباب", "سيف", "زه يتون", "گوشت", "ماسي", "دولمه", "فيقي", "تري", "شمتي", "ماست", "سينگ", "نان", "برنج", "هيك"]
   },
   heywan: {
     id: "heywan",
     name: "Heywan",
-    words: ["Seg", "Pîşîk", "Hesp", "Şêr", "Piling", "Kuçik", "Mêş", "Mar", "Fîl", "Dîk", "Berx", "Bizine", "Çêlek", "Kevok"]
+    words: ["سه", "پشيك", "هه سپ", "شير", "پلنگ", "ريفي", "ميش", "ماار", "فيل", "ديكل", "به رخ", "بزن", "جييل", "مشك"]
   },
   bajar: {
     id: "bajar",
     name: "Bajar",
-    words: ["Dihok", "Zaxo", "Amed", "Hewlêr", "Silêmanî", "Kerkûk", "Şengal", "Akrê", "Amedî", "Şêladizê", "Zûmar"]
+    words: ["دهوك", "زاخو", "دوميز", "هه ولير", "سليماني", "كه ركوك", "شنگال", "ئاكري", "ئاميدي", "شيلادزي", "زومار"]
   },
   werzis: {
     id: "werzis",
     name: "Werziş",
-    words: ["Tepe", "Gog", "Basketbol", "Melevanî", "Tênîs", "Rêk", "Zorxan", "Boks", "Fûtbol"]
+    words: ["گيايئ ياريگه هي", "گولجي", "ته نسا ميزي", "مه له فاني", "تنس", "بيكام", "زيدان", "كرستيانو", "ميسي"]
   }
 };
