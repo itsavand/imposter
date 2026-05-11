@@ -404,7 +404,7 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
                   <span className="text-5xl font-black text-white">{imposter?.name.charAt(0).toUpperCase()}</span>
                </div>
                <p className="text-3xl font-black tracking-tighter mb-2">{imposter?.name}</p>
-               <p className="text-rose-500 font-bold text-xs uppercase tracking-widest bg-rose-500/10 inline-block px-4 py-1.5 rounded-full border border-rose-500/20">ساختەکار بوو!</p>
+               <p className="text-rose-500 font-bold text-xs uppercase tracking-widest bg-rose-500/10 inline-block px-4 py-1.5 rounded-full border border-rose-500/20">دره وين بوو!</p>
              </motion.div>
 
              <div className="bg-indigo-600/10 p-5 rounded-3xl border border-indigo-500/30 w-full max-w-sm mx-auto mb-6 shadow-inner text-center">

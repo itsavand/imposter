@@ -112,9 +112,9 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
           >
             <div className="text-center mb-12">
               <h1 className="text-6xl font-black tracking-tighter text-white drop-shadow-md">
-                ساختە<span className="text-red-500">کار</span>
+                مروفي <span className="text-red-500">دره وين</span>
               </h1>
-              <p className="text-slate-400 mt-2 text-lg font-bold tracking-wide">کێ ژ مە ساختەکارە؟</p>
+              <p className="text-slate-400 mt-2 text-lg font-bold tracking-wide">کێ ژ مە دره وينه؟</p>
             </div>
             
             <button

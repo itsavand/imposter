@@ -40,7 +40,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white px-4" dir="rtl">
         <div className="max-w-md w-full text-center space-y-8">
           <h1 className="text-6xl font-black tracking-tighter text-white drop-shadow-md">
-            ساختە<span className="text-red-500">کار</span>
+            مروفي <span className="text-red-500">دره وين</span>
           </h1>
           <p className="text-slate-400 text-lg font-medium tracking-wide">
             بۆ دەستپێکرنێ ب گووگڵ پشکدار بە
