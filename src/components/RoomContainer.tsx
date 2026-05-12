@@ -169,12 +169,18 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
            }
         });
 
-        let maxVotes = 0;
-        Object.values(voteCounts).forEach(v => {
-           if (v > maxVotes) maxVotes = v;
+        let maxPlayerVotes = 0;
+        Object.entries(voteCounts).forEach(([k, v]) => {
+           if (k !== 'SKIP' && v > maxPlayerVotes) maxPlayerVotes = v;
         });
 
-        const caught = voteCounts[room.imposterId] === maxVotes && maxVotes > 0;
+        let tiedCount = 0;
+        Object.entries(voteCounts).forEach(([k, v]) => {
+           if (k !== 'SKIP' && v === maxPlayerVotes) tiedCount++;
+        });
+
+        const skipVotes = voteCounts['SKIP'] || 0;
+        const caught = (voteCounts[room.imposterId] === maxPlayerVotes) && (maxPlayerVotes > 0) && (tiedCount === 1) && (maxPlayerVotes > skipVotes);
 
         const promises = players.map(p => {
            let add = 0;
@@ -370,6 +376,28 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
                    )
                 })}
              </div>
+
+             <div className="mt-4">
+                <button
+                    disabled={!!me?.vote}
+                    onClick={() => updateDoc(doc(db, "rooms", roomId, "players", auth.currentUser!.uid), { vote: 'SKIP' })}
+                    className={cn(
+                       "w-full bg-slate-900/80 border border-white/10 rounded-2xl p-4 flex flex-col flex-1 items-center justify-center relative transition-all",
+                       me?.vote === 'SKIP' && "ring-2 ring-slate-500 ring-offset-4 ring-offset-slate-950 scale-[1.02]",
+                       !me?.vote && "hover:border-slate-500 hover:bg-slate-800"
+                    )}
+                >
+                    <div className="absolute -top-3 flex gap-1 justify-center w-full z-20">
+                       {players.filter(voter => voter.vote === 'SKIP').map((voter, i) => (
+                         <div key={i} className="w-8 h-8 rounded-full bg-slate-500 border-2 border-slate-950 flex items-center justify-center font-bold text-xs shadow-lg text-white font-mono">
+                           {voter.name.charAt(0).toUpperCase()}
+                         </div>
+                       ))}
+                    </div>
+                    
+                    <span className="font-bold text-lg text-slate-300">دەنگ نەدان (Skip)</span>
+                 </button>
+              </div>
           </div>
         );
       case "result":
@@ -383,11 +411,18 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
              if (p.vote === room.imposterId) imposterVotes++;
            }
         });
-        let maxVotes = 0;
-        Object.values(voteCounts).forEach(v => {
-           if (v > maxVotes) maxVotes = v;
+        let maxPlayerVotes = 0;
+        Object.entries(voteCounts).forEach(([k, v]) => {
+           if (k !== 'SKIP' && v > maxPlayerVotes) maxPlayerVotes = v;
         });
-        const caught = voteCounts[room.imposterId] === maxVotes && maxVotes > 0;
+
+        let tiedCount = 0;
+        Object.entries(voteCounts).forEach(([k, v]) => {
+           if (k !== 'SKIP' && v === maxPlayerVotes) tiedCount++;
+        });
+
+        const skipVotes = voteCounts['SKIP'] || 0;
+        const caught = (voteCounts[room.imposterId] === maxPlayerVotes) && (maxPlayerVotes > 0) && (tiedCount === 1) && (maxPlayerVotes > skipVotes);
 
         if (caught && me?.userId !== room.imposterId) {
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
@@ -497,10 +532,10 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
          </AnimatePresence>
        </div>
 
-       <div className="absolute top-0 right-4 z-50 mt-2">
-           {room?.status === "waiting" && (
-             <button onClick={handleLeave} className="bg-rose-600/20 text-rose-500 hover:bg-rose-600 hover:text-white px-4 py-1.5 rounded-full font-bold text-[10px] uppercase tracking-wide transition-all border border-rose-500/30">
-                دەرکەفتن
+       <div className="absolute top-4 left-4 z-50 mt-2">
+           {room?.status !== "finished" && (
+             <button onClick={handleLeave} className="bg-rose-600/20 text-rose-500 hover:bg-rose-600 hover:text-white px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wide transition-all border border-rose-500/30 flex items-center gap-1 shadow-lg backdrop-blur-md">
+                <LogOut size={14} /> دەرکەفتن
              </button>
            )}
        </div>
