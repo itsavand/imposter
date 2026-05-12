@@ -3,7 +3,7 @@ import { db, auth, OperationType, handleFirestoreError } from "../firebase";
 import { doc, onSnapshot, collection, updateDoc, deleteDoc, getDoc, deleteField } from "firebase/firestore";
 import { CATEGORIES } from "../constants";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Check, X, Crown, Clock } from "lucide-react";
+import { LogOut, Check, X, Crown, Clock, Copy, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { cn } from "../lib/utils";
 
@@ -42,6 +42,19 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
     }
     prevPlayersRef.current = players;
   }, [players, loading]);
+
+  useEffect(() => {
+    if (!room || loading) return;
+    if ((room.status === 'playing' || room.status === 'voting') && players.length > 0 && players.length < 3) {
+      if (room.hostId === auth.currentUser?.uid) {
+        updateDoc(doc(db, "rooms", roomId), { 
+           status: "finished",
+           roundEndTime: deleteField()
+        }).catch(console.error);
+      }
+      addToast("بەهۆی کێمبوونا یاریزانان یاری ب دوماهی هات!");
+    }
+  }, [players.length, room?.status, room?.hostId, loading, roomId]);
 
   useEffect(() => {
     const unsubRoom = onSnapshot(doc(db, "rooms", roomId), (docSnap) => {
@@ -217,10 +230,21 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
           <div className="flex-1 flex flex-col pt-4" dir="rtl">
              <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-3xl p-6 mb-6 text-center shadow-lg">
                <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">کۆدێ ژوورێ</p>
-               <h2 className="text-6xl font-black tracking-[0.3em] bg-slate-950 rounded-2xl py-4 text-indigo-400 inline-block px-10 shadow-inner border border-white/5 uppercase relative overflow-hidden group" dir="ltr">
-                 {room.code}
-                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
-               </h2>
+               <div className="flex items-center justify-center gap-3">
+                 <h2 className="text-6xl font-black tracking-[0.3em] bg-slate-950 rounded-2xl py-4 text-indigo-400 inline-block px-10 shadow-inner border border-white/5 uppercase relative overflow-hidden group mb-0" dir="ltr">
+                   {room.code}
+                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                 </h2>
+                 <button 
+                   onClick={() => {
+                     navigator.clipboard.writeText(room.code);
+                     addToast("کۆد هاتە کۆپیکرن!");
+                   }}
+                   className="bg-slate-800 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-slate-700 transition-colors shrink-0 outline-none active:scale-95"
+                 >
+                   <Copy size={32} />
+                 </button>
+               </div>
                <div className="mt-4 flex gap-4 justify-center text-[10px] font-bold uppercase tracking-wider">
                   <div className="bg-slate-950 px-4 py-2 rounded-lg text-slate-300 border border-white/5">
                     <span className="text-slate-500 ml-2">جور:</span>{CATEGORIES[room.category as keyof typeof CATEGORIES]?.name || room.category}
