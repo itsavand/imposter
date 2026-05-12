@@ -115,6 +115,8 @@ export default function RoomContainer({ roomId, onLeave }: { roomId: string, onL
             hostId: newHost.userId,
             hostName: newHost.name
           });
+        } else {
+          await deleteDoc(doc(db, "rooms", roomId));
         }
       }
       await deleteDoc(doc(db, "rooms", roomId, "players", auth.currentUser!.uid));

@@ -35,6 +35,7 @@ export default function Home({ onJoin }: { onJoin: (roomId: string) => void }) {
 
       await setDoc(doc(db, "rooms", roomId), {
         hostId: auth.currentUser!.uid,
+        hostName: username,
         code: roomId,
         status: "waiting",
         category: categoryId,

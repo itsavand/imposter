@@ -12,10 +12,11 @@ service cloud.firestore {
 
     function isValidRoom(data) {
       return data.keys().hasAll(['hostId', 'code', 'status', 'createdAt'])
-        && data.hostId == request.auth.uid
+        && data.hostId is string
         && data.code is string && data.code.size() >= 4 && data.code.size() <= 10
         && data.status in ['waiting', 'playing', 'voting', 'result', 'finished']
         && data.createdAt is number
+        && (!('hostName' in data) || data.hostName is string)
         && (!('category' in data) || (data.category is string && data.category.size() <= 50))
         && (!('totalRounds' in data) || data.totalRounds is number)
         && (!('currentRound' in data) || data.currentRound is number)
@@ -41,11 +42,11 @@ service cloud.firestore {
     match /rooms/{roomId} {
       allow get: if isSignedIn() && isValidId(roomId);
       allow list: if isSignedIn();
-      allow create: if isSignedIn() && isValidId(roomId) && isValidRoom(incoming());
+      allow create: if isSignedIn() && isValidId(roomId) && isValidRoom(incoming()) && incoming().hostId == request.auth.uid;
       allow update: if isSignedIn() && isValidId(roomId) 
                     && existing().hostId == request.auth.uid 
-                    && existing().hostId == incoming().hostId
                     && isValidRoom(incoming());
+      allow delete: if isSignedIn() && isValidId(roomId) && existing().hostId == request.auth.uid;
       
       match /players/{playerId} {
         allow get: if isSignedIn() && isValidId(roomId) && isValidId(playerId);
@@ -71,6 +72,10 @@ service cloud.firestore {
                           isRoomHost(roomId)
                         )
                       );
+                      
+        allow delete: if isSignedIn() 
+                      && isValidId(roomId) && isValidId(playerId)
+                      && (playerId == request.auth.uid || isRoomHost(roomId));
       }
     }
   }
